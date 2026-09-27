@@ -463,4 +463,19 @@ dialog::backdrop { background: rgba(19, 23, 21, 0.45); }
   .proposal-actions { justify-content: flex-start; }
 }
 .kpis-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.promo-panel { margin-top: 24px; }
+.basket-pairs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.basket-name { font-size: 17px; line-height: 1.6; }
+.bundle-inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.bundle-inputs label { display: flex; flex-direction: column; gap: 6px; }
+.bundle-inputs .field { min-width: 0; width: 100%; }
+@media (max-width: 860px) { .basket-pairs, .bundle-inputs { grid-template-columns: 1fr; } }
+.promo-inputs { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
+.promo-inputs label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.promo-inputs .field { width: 100%; min-width: 0; }
+.promo-results { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.promo-results > div { display: flex; flex-direction: column; gap: 8px; background: var(--raised); padding: 16px; border-radius: var(--radius); }
+.promo-results strong { font-size: 22px; overflow-wrap: anywhere; }
+.promo-message { padding: 14px; background: var(--accent-soft); border-radius: var(--radius); }
+@media (max-width: 860px) { .promo-inputs { grid-template-columns: 1fr; } .promo-results { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 860px) { .kpis-3 { grid-template-columns: 1fr 1fr; } }

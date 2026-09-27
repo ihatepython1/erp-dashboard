@@ -6,6 +6,8 @@ import { CommandPalette } from "./components/Overlays";
 import { Overview } from "./pages/Overview";
 import { Orders } from "./pages/Orders";
 import { Inventory } from "./pages/Inventory";
+import { StockHealth } from "./pages/StockHealth";
+import { Basket } from "./pages/Basket";
 import { Receivables } from "./pages/Receivables";
 import { Customers } from "./pages/Customers";
 import { Proposals } from "./pages/Proposals";
@@ -14,6 +16,8 @@ const NAV: { path: string; key: Keys }[] = [
   { path: "/", key: "nav_overview" },
   { path: "/orders", key: "nav_orders" },
   { path: "/inventory", key: "nav_inventory" },
+  { path: "/stock-health", key: "nav_stockHealth" },
+  { path: "/basket", key: "nav_basket" },
   { path: "/receivables", key: "nav_receivables" },
   { path: "/customers", key: "nav_customers" },
   { path: "/proposals", key: "nav_proposals" }
@@ -56,6 +60,8 @@ export default function App() {
   const page =
     route.path === "/orders" ? <Orders data={data} route={route} /> :
     route.path === "/inventory" ? <Inventory data={data} route={route} /> :
+    route.path === "/stock-health" ? <StockHealth data={data} /> :
+    route.path === "/basket" ? <Basket data={data} /> :
     route.path === "/receivables" ? <Receivables data={data} route={route} /> :
     route.path === "/customers" ? <Customers data={data} route={route} /> :
     route.path === "/proposals" ? <Proposals data={data} /> :
