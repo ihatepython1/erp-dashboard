@@ -12,6 +12,8 @@ React 19 and strict TypeScript, built with Vite. No UI kit, no chart library, no
 
 ## Pages
 
+**Sales analysis.** Compare a selected month with the previous month or the same month last year, or select two custom date ranges. Incomplete months use matching day numbers. Revenue, gross profit, bills and average bill value reconcile with contribution tables by product, category, sales channel, customer group and customer. SKU-level quantity and average-price effects explain the arithmetic behind changes; they do not establish causation. Export the comparison to CSV. A monthly product heatmap switches between revenue, units and gross profit, using either absolute totals or each product's average across complete months in the selected year. Select a cell for its totals and twelve-month history. Partial months and missing history are labelled. Summaries are deterministic and do not require an AI API key.
+
 **Overview.** Revenue, gross margin, order count and overdue receivables for the month, each against the same span of days last month. Revenue by month against the previous year, and breakdowns by channel, province and product. Next to them, the one dark panel on the page: what needs attention today — stockouts, customers over 90 days late or over their credit limit, lines at their reorder point, orders still to ship. Every item links to a filtered list.
 
 **Sales orders.** Around ten thousand orders in a grid that stays smooth because only the visible rows exist in the DOM. Filter, search, sort, and open an order for its lines, cost and gross profit.

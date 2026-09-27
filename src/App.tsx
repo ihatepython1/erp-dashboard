@@ -8,12 +8,14 @@ import { Orders } from "./pages/Orders";
 import { Inventory } from "./pages/Inventory";
 import { StockHealth } from "./pages/StockHealth";
 import { Basket } from "./pages/Basket";
+import { SalesAnalysis } from "./pages/SalesAnalysis";
 import { Receivables } from "./pages/Receivables";
 import { Customers } from "./pages/Customers";
 import { Proposals } from "./pages/Proposals";
 
 const NAV: { path: string; key: Keys }[] = [
   { path: "/", key: "nav_overview" },
+  { path: "/sales-analysis", key: "nav_salesAnalysis" },
   { path: "/orders", key: "nav_orders" },
   { path: "/inventory", key: "nav_inventory" },
   { path: "/stock-health", key: "nav_stockHealth" },
@@ -58,6 +60,7 @@ export default function App() {
   useEffect(() => { document.title = `${t(current.key)} — ${t("appName")}`; }, [current, t]);
 
   const page =
+    route.path === "/sales-analysis" ? <SalesAnalysis data={data} /> :
     route.path === "/orders" ? <Orders data={data} route={route} /> :
     route.path === "/inventory" ? <Inventory data={data} route={route} /> :
     route.path === "/stock-health" ? <StockHealth data={data} /> :

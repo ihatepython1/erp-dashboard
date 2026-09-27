@@ -464,6 +464,24 @@ dialog::backdrop { background: rgba(19, 23, 21, 0.45); }
 }
 .kpis-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .promo-panel { margin-top: 24px; }
+.sales-analysis > .panel { margin-top: 22px; }
+.analysis-dates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.analysis-dates label { display: flex; flex-direction: column; gap: 6px; }
+.analysis-dates .field { min-width: 0; width: 100%; }
+.analysis-scroll { overflow: auto; max-height: 570px; }
+.analysis-table { min-width: 1050px; }
+.analysis-table th { position: sticky; top: 0; z-index: 1; background: var(--surface); }
+.analysis-table td { min-width: 135px; vertical-align: top; }
+.analysis-table td:first-child { min-width: 200px; }
+.heat-table { border-collapse: separate; border-spacing: 3px; font-size: 12px; width: 100%; }
+.heat-table th { background: var(--surface); text-align: left; padding: 8px; }
+.heat-table thead th { position: sticky; top: 0; z-index: 2; }
+.heat-table tbody th { position: sticky; left: 0; min-width: 205px; max-width: 240px; z-index: 1; }
+.heat-table button { width: 100%; min-width: 65px; min-height: 43px; border: 1px solid var(--line); border-radius: 5px; color: var(--ink); cursor: pointer; font: inherit; font-variant-numeric: tabular-nums; }
+.heat-table button:disabled { cursor: default; color: var(--muted); }
+.heat-table button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.text-good { color: var(--good); }
+@media (max-width: 860px) { .analysis-dates { grid-template-columns: 1fr 1fr; } }
 .basket-pairs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
 .basket-name { font-size: 17px; line-height: 1.6; }
 .bundle-inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
