@@ -4,6 +4,8 @@ Operations, money and relationships for a consumer-goods wholesaler in Lampang, 
 
 **Live demo:** https://ihatepython1.github.io/erp-dashboard/
 
+The system proposes; the owner decides. Suggestions carry the figures behind them, two kinds of action can never be automated at all, and every decision is recorded so the rules can be judged on how often they were accepted.
+
 React 19 and strict TypeScript, built with Vite. No UI kit, no chart library, no state library: the data grid, the charts, the drawer, the command palette and the question reader are all written for this project. Thai and English throughout, with Buddhist-era dates in Thai.
 
 ![Overview](docs/overview.png)
@@ -18,10 +20,13 @@ React 19 and strict TypeScript, built with Vite. No UI kit, no chart library, no
 
 **Receivables.** An ageing bar for the whole ledger, then every customer's debt split across the buckets, worst first, with their unpaid invoices one click away.
 
+**Proposals.** Everything the system thinks is worth doing today — reorder suggestions grouped into one purchase order per supplier, win-back calls, accounts bad enough to consider holding credit on, and debts young enough to chase politely. Each card carries the figures it was derived from and three answers: accept, edit first, or reject with a reason.
+
 **Customers (CRM).** RFM scoring into A/B/C tiers, each shop's own ordering rhythm, and a churn flag raised when an account has been quiet for more than twice its own normal gap. Twelve months of purchases, the lines they buy regularly, lines their peers buy that they do not, contact history, and open follow-ups.
 
 | | |
 |---|---|
+| ![Proposals](docs/proposals.png) | ![Autonomy settings](docs/autonomy.png) |
 | ![Customers](docs/customers.png) | ![Customer detail](docs/customer-detail.png) |
 | ![Inventory](docs/inventory.png) | ![Receivables in dark mode](docs/receivables-dark.png) |
 
@@ -56,6 +61,24 @@ Every figure on the page that follows is computed by the same tested selectors a
 Open a customer who owes money and draft a message for LINE in three tones. The facts — how many invoices, the total, the oldest invoice number, how many days late, what they last promised — are pulled from the ledger and **formatted into strings before the model sees them**. The model rewrites wording; it cannot invent a figure, because it is never handed a raw one. Offline, a template does the same job, and the dialog says which wrote it.
 
 The backend checks the result and throws the draft away if the figures went missing, falling back to the template.
+
+### 3. Proposing, never acting
+
+![Proposals](docs/proposals.png)
+
+A suggestion is only useful if the person reading it can tell whether to trust it, so every proposal shows **the numbers it came from** rather than a sentence describing them: *quiet for 18 days · used to order every 6 days · ฿292,103 bought over 12 months · −53.4% against the same period last year*. Three answers are always available — accept, edit first, reject with a reason.
+
+**How much it may do alone is set per kind**, and starts at suggest-only for everything. At *act alone*, a limit applies: purchase orders under ฿5,000 can go through unattended, larger ones wait for a person.
+
+**Two kinds can never act alone, whatever the settings say.** Holding a customer's credit and sending them a message are locked in `src/lib/decisions.ts`, because a mistake there loses the account on the spot and automating it saves one click. The lock is enforced in four places and tested: the UI never offers the option, `clampLevel` rejects it, settings are clamped when read from storage, and `autoApplicable` filters locked kinds out regardless. A settings value edited by hand in localStorage still cannot unlock it.
+
+### Measuring whether the proposals were any good
+
+![Decision log](docs/decision-log.png)
+
+Every decision is recorded: which proposal, what was chosen, by a person or automatically, and the reason for a rejection. That gives an acceptance rate per kind — and a rule that keeps being rejected is a **wrong threshold, not a wording problem**. `needsReview` flags it once there are enough decisions to say so, and the settings panel says exactly that.
+
+Accepted and edited are counted separately: a proposal that was worth having but needed adjusting is still a useful proposal, and the two rates say different things about the rule.
 
 ### Deliberately not done with a model
 
@@ -111,7 +134,7 @@ Year-on-year is used for the customer trend rather than the previous quarter. Co
 
 ## Tests
 
-85 tests on Vitest and Testing Library.
+111 tests on Vitest and Testing Library.
 
 ```bash
 npm test
@@ -119,6 +142,9 @@ npm test
 
 - **Data rules:** order totals equal their lines; nothing is paid before it is ordered; ageing buckets reconcile per customer and against the overview; suggested orders are whole cartons covering lead time plus target; healthy stock is never reordered; customer names are unique in both languages
 - **CRM:** RFM scores stay within range and are monotonic in spend and recency; tiers split the book; churn is only raised for established accounts genuinely off their rhythm; a customer ordering on time is never flagged; every contact and task points at a real customer and the rep who covers their province; the biggest debtors all have a collection task
+- **Proposals:** a purchase order's amount equals its lines at cost; win-backs only target accounts the CRM already flags; credit holds only target genuinely bad debt; chasing and holding are never proposed for the same account at once; proposal ids are stable so a decision stays attached
+- **Guardrails:** locked kinds are never offered, never clamped upward, never unlocked by tampered storage and never auto-applied; automatic application respects the limit, is idempotent, and never overwrites a decision a person made
+- **Measurement:** acceptance and useful rates, value excluding rejections, and the review flag that fires only with enough evidence
 - **Drafting:** the facts match the ledger, the message repeats those figures and contains no others, tone changes the ending and not the numbers
 - **AI:** the labelled evaluation set, the refusals, page/filter consistency, and validation of model output on both sides
 - **Utilities:** the virtual window stays small for a million rows, stable sorting with empties last, CSV quoting, hash routing
@@ -148,11 +174,11 @@ Routing uses the URL hash and Vite builds with relative asset paths, so the site
 
 ```
 src/
-  data/        types, seeded generator, ERP selectors, CRM metrics
+  data/        types, seeded generator, ERP selectors, CRM metrics, proposal rules
   ai/          question parser (offline) and the model client
-  lib/         day arithmetic, i18n and formatting, router, sorting, CSV
+  lib/         day arithmetic, i18n and formatting, router, sorting, CSV, autonomy and the decision log
   components/  DataGrid, charts, drawer, command palette, draft dialog
-  pages/       Overview, Orders, Inventory, Receivables, Customers
+  pages/       Overview, Orders, Inventory, Receivables, Customers, Proposals
 ai-backend/    optional zero-dependency proxy that holds the API key
 tests/         data rules, CRM, AI evaluation, utilities, grid behaviour
 ```
@@ -160,6 +186,8 @@ tests/         data rules, CRM, AI evaluation, utilities, grid behaviour
 ## ภาษาไทย
 
 แดชบอร์ด ERP และ CRM ของบริษัทค้าส่งสินค้าอุปโภคบริโภคสมมุติในลำปาง มีห้าหน้า คือ ภาพรวม ใบสั่งขาย สินค้าคงคลัง ลูกหนี้ และลูกค้า เขียนด้วย React + TypeScript โดยไม่ใช้ UI library หรือ chart library
+
+หน้า "ข้อเสนอ" ทำงานบนหลักว่าระบบเสนอได้แต่คนเป็นคนตัดสินใจ ทุกข้อเสนอแสดงตัวเลขที่ใช้คิดให้ตรวจสอบได้ ตั้งระดับอำนาจได้ทีละเรื่อง และมีสองเรื่องที่ระบบทำเองไม่ได้เด็ดขาดคือระงับเครดิตกับส่งข้อความหาลูกค้า ทุกการตัดสินใจถูกบันทึกไว้เพื่อวัดว่าเกณฑ์ไหนถูกใช้จริงกี่เปอร์เซ็นต์
 
 ฝั่ง AI ยึดหลักเดียวคือ **ไม่ให้โมเดลคำนวณตัวเลข** โมเดลทำสองอย่างเท่านั้น คือแปลคำถามภาษาไทยเป็นตัวกรอง (เช่น "ลูกค้าที่เชียงรายเสี่ยงหาย" กลายเป็นหน้าลูกค้าที่กรองไว้แล้ว) และเรียบเรียงข้อความติดตามหนี้จากข้อเท็จจริงที่คำนวณและจัดรูปแบบเสร็จแล้ว ทุกฟีเจอร์ทำงานได้เต็มรูปแบบโดยไม่ต้องมี API key เพราะมีตัวตีความในเครื่องเป็นค่าเริ่มต้น และมีชุดวัดผล 36 คำถามที่วัดความแม่นยำ พร้อมคำถามที่ระบบต้องปฏิเสธแทนการเดา
 

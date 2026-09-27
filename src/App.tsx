@@ -8,13 +8,15 @@ import { Orders } from "./pages/Orders";
 import { Inventory } from "./pages/Inventory";
 import { Receivables } from "./pages/Receivables";
 import { Customers } from "./pages/Customers";
+import { Proposals } from "./pages/Proposals";
 
 const NAV: { path: string; key: Keys }[] = [
   { path: "/", key: "nav_overview" },
   { path: "/orders", key: "nav_orders" },
   { path: "/inventory", key: "nav_inventory" },
   { path: "/receivables", key: "nav_receivables" },
-  { path: "/customers", key: "nav_customers" }
+  { path: "/customers", key: "nav_customers" },
+  { path: "/proposals", key: "nav_proposals" }
 ];
 
 type Theme = "light" | "dark";
@@ -56,6 +58,7 @@ export default function App() {
     route.path === "/inventory" ? <Inventory data={data} route={route} /> :
     route.path === "/receivables" ? <Receivables data={data} route={route} /> :
     route.path === "/customers" ? <Customers data={data} route={route} /> :
+    route.path === "/proposals" ? <Proposals data={data} /> :
     <Overview data={data} />;
 
   const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
