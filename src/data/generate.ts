@@ -107,8 +107,9 @@ const KINDS: Record<Channel, { th: string; en: string }[]> = {
   line: [{ th: "%สโตร์", en: "% Store" }, { th: "%มาร์ท", en: "% Mart" }]
 };
 
-function pickWeighted<T>(items: T[], weights: number[], r: number): T {
-  const total = weights.reduce((a, b) => a + b, 0);
+function pickWeighted<T>(items: T[], weights: ArrayLike<number>, r: number): T {
+  let total = 0;
+  for (let i = 0; i < weights.length; i++) total += weights[i]!;
   let x = r * total;
   for (let i = 0; i < items.length; i++) {
     x -= weights[i]!;
@@ -179,9 +180,18 @@ export function generate(seed: number, today = TODAY): Dataset {
 
   /* -------------------------------- orders -------------------------------- */
   const orders: Order[] = [];
-  const custWeights = customers.map((c) => c.size);
   const prodWeights = products.map((p) => p.popularity);
   let seq = 1;
+
+  // Each account has its own trajectory rather than a fixed weight: some grow,
+  // some fade, and a handful stop buying altogether. Without this, per-customer
+  // trends are just Poisson noise and a churn report has nothing real to find.
+  const drift = customers.map(() => between(-0.45, 0.75));
+  const stoppedAt = customers.map((c) =>
+    // only established accounts churn, and only recently enough to still notice
+    c.channel !== "wholesale" && rand() < 0.07 ? today - int(10, 70) : Infinity
+  );
+  const dayWeights = new Float64Array(customers.length);
 
   for (let day = 0; day <= today; day++) {
     const { month, weekday, year } = parts(day);
@@ -189,8 +199,13 @@ export function generate(seed: number, today = TODAY): Dataset {
     const expected = 17 * growth * SEASON[month - 1]! * WEEKDAY[weekday]!;
     const count = Math.max(0, Math.round(expected + (rand() - 0.5) * 6));
 
+    for (let i = 0; i < customers.length; i++) {
+      const c = customers[i]!;
+      dayWeights[i] = day > stoppedAt[i]! ? 0 : Math.max(0.05, c.size * (1 + drift[i]! * (day / 365)));
+    }
+
     for (let k = 0; k < count; k++) {
-      const customer = pickWeighted(customers, custWeights, rand());
+      const customer = pickWeighted(customers, dayWeights, rand());
       const lineCount = customer.channel === "wholesale" ? int(3, 8) : customer.channel === "shop" ? int(2, 7) : int(1, 4);
       const lines: OrderLine[] = [];
       const used = new Set<string>();

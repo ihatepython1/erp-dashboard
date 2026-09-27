@@ -1,7 +1,9 @@
 import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
-import { useI18n } from "../lib/i18n";
+import { useI18n, type Keys } from "../lib/i18n";
 import { navigate } from "../lib/util";
 import type { Dataset } from "../data/types";
+import { askForIntent } from "../ai/client";
+import { intentToHref, parseQuestion, type Intent } from "../ai/parse";
 
 /* --------------------------------- Drawer --------------------------------- */
 // The native <dialog> gives focus trapping, Escape to close and inert
@@ -60,19 +62,70 @@ export function CommandPalette({ data, open, onClose }: { data: Dataset; open: b
     { id: "p-o", group: t("cmd_pages"), label: t("nav_overview"), detail: "", href: "#/" },
     { id: "p-s", group: t("cmd_pages"), label: t("nav_orders"), detail: "", href: "#/orders" },
     { id: "p-i", group: t("cmd_pages"), label: t("nav_inventory"), detail: "", href: "#/inventory" },
-    { id: "p-r", group: t("cmd_pages"), label: t("nav_receivables"), detail: "", href: "#/receivables" }
+    { id: "p-r", group: t("cmd_pages"), label: t("nav_receivables"), detail: "", href: "#/receivables" },
+    { id: "p-c", group: t("cmd_pages"), label: t("nav_customers"), detail: "", href: "#/customers" }
   ], [t]);
+
+  // A typed question is read into a filter intent. The rules run instantly on
+  // every keystroke; if an AI backend exists it is asked too, and its answer
+  // replaces the local one when it arrives.
+  const [intent, setIntent] = useState<Intent | null>(null);
+  useEffect(() => {
+    const words = q.trim();
+    if (words.length < 6) { setIntent(null); return; }
+    setIntent(parseQuestion(words));
+    let live = true;
+    const id = setTimeout(() => {
+      askForIntent(words).then((i) => { if (live) setIntent(i); });
+    }, 350);
+    return () => { live = false; clearTimeout(id); };
+  }, [q]);
+
+
+
+  // the reading is shown in the same words the filters use, so a wrong
+  // interpretation is obvious at a glance rather than hidden behind param names
+  const describe = (i: Intent) => {
+    const page = { "/orders": t("nav_orders"), "/inventory": t("nav_inventory"),
+                   "/receivables": t("nav_receivables"), "/customers": t("nav_customers") }[i.route];
+    const LABEL: Record<string, Keys> = {
+      "filter:d90": "ar_d90Only", "filter:overdue": "ar_overdueOnly", "filter:overLimit": "ar_overLimitOnly",
+      "state:out": "inv_state_out", "state:low": "inv_state_low", "state:ok": "inv_state_ok",
+      "status:packing": "st_packing", "status:shipped": "st_shipped", "status:delivered": "st_delivered",
+      "status:cancelled": "st_cancelled",
+      "channel:line": "ch_line", "channel:wholesale": "ch_wholesale", "channel:shop": "ch_shop", "channel:online": "ch_online",
+      "risk:1": "cust_risk", "tier:A": "cust_tierA", "trend:down": "cust_declining", "tasks:open": "cust_tasksOpen",
+      "range:90": "range_90", "range:all": "range_all", "range:30": "range_30"
+    };
+    const province = (en: string) => data.customers.find((c) => c.province.en === en)?.province[lang] ?? en;
+    const bits = Object.entries(i.params).map(([k, v]) => {
+      const key = LABEL[`${k}:${v}`];
+      if (key) return t(key);
+      if (k === "prov") return province(v);
+      if (k === "open") return v;
+      return `${k}=${v}`;
+    });
+    return bits.length ? `${page} · ${bits.join(" · ")}` : page;
+  };
 
   const hits = useMemo<Hit[]>(() => {
     const s = q.trim().toLowerCase();
     if (!s) return pages;
     const has = (...xs: string[]) => xs.some((x) => x.toLowerCase().includes(s));
-    const out: Hit[] = pages.filter((p) => has(p.label));
+    const out: Hit[] = [];
+    if (intent) {
+      out.push({
+        id: "ai", group: t("ai_ask"), label: `${t("ai_understood")}: ${describe(intent)}`,
+        detail: `${intent.source === "model" ? t("ai_byModel") : t("ai_byRules")} · ${Math.round(intent.confidence * 100)}%`,
+        href: intentToHref(intent)
+      });
+    }
+    out.push(...pages.filter((p) => has(p.label)));
     for (const c of data.customers) {
       if (out.length > 14) break;
       if (has(c.name.th, c.name.en, c.id))
         out.push({ id: "c-" + c.id, group: t("cmd_customers"), label: c.name[lang], detail: c.province[lang],
-                   href: `#/orders?q=${encodeURIComponent(c.name[lang])}&range=all` });
+                   href: `#/customers?customer=${c.id}` });
     }
     for (const p of data.products) {
       if (out.length > 20) break;
@@ -89,7 +142,7 @@ export function CommandPalette({ data, open, onClose }: { data: Dataset; open: b
       }
     }
     return out;
-  }, [q, data, pages, t, lang]);
+  }, [q, data, pages, t, lang, intent]);
 
   useEffect(() => setActive(0), [q]);
 
@@ -114,6 +167,9 @@ export function CommandPalette({ data, open, onClose }: { data: Dataset; open: b
           if (e.key === "Enter") { e.preventDefault(); go(hits[active]); }
         }}
       />
+      {q.trim().length >= 6 && !intent && (
+        <div className="palette-ai"><p className="palette-empty">{t("ai_cant")}</p></div>
+      )}
       <ul id={listId} role="listbox" className="palette-list">
         {hits.length === 0 && <li className="palette-empty">{t("noResults")}</li>}
         {hits.map((h, i) => (
@@ -122,7 +178,7 @@ export function CommandPalette({ data, open, onClose }: { data: Dataset; open: b
             id={`${listId}-${i}`}
             role="option"
             aria-selected={i === active}
-            className={i === active ? "active" : undefined}
+            className={`${h.id === "ai" ? "ai-hit " : ""}${i === active ? "active" : ""}`.trim() || undefined}
             onPointerMove={() => setActive(i)}
             onClick={() => go(h)}
           >

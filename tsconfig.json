@@ -11,6 +11,8 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
+    "allowJs": true,   // the reference AI backend is plain .mjs; tests import its validator
+    "checkJs": false,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "noEmit": true,

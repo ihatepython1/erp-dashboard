@@ -350,3 +350,74 @@ dialog::backdrop { background: rgba(19, 23, 21, 0.45); }
 @media (prefers-reduced-motion: reduce) {
   .drawer[open] { animation: none; }
 }
+
+/* ------------------------------ CRM additions ------------------------------ */
+.chip.st-risk { background: var(--danger-bg); color: var(--danger); border-color: transparent; margin-left: 8px; }
+.chip.ck-complaint, .chip.tk-collect { background: var(--danger-bg); color: var(--danger); border-color: transparent; }
+.chip.ck-promise, .chip.tk-winback { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.chip.ck-visit, .chip.tk-visit { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+
+.tier { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 5px; font-size: 12.5px; font-weight: 600; }
+.tier-A { background: var(--accent); color: #fff; }
+.tier-B { background: var(--accent-soft); color: var(--accent); }
+.tier-C { background: var(--raised); color: var(--muted); border: 1px solid var(--line); }
+
+.rfm { display: flex; align-items: center; gap: 16px; padding: 14px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.rfm .tier { width: 34px; height: 34px; font-size: 16px; }
+.rfm-scores { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; flex: 1; }
+.rfm-scores > div { display: grid; gap: 4px; font-size: 12.5px; color: var(--muted); }
+.pips { display: flex; gap: 3px; }
+.pips i { width: 12px; height: 6px; border-radius: 2px; background: var(--line); }
+.pips i.on { background: var(--accent); }
+
+.riskbox { background: var(--danger-bg); border-radius: var(--radius); padding: 12px 14px; margin-top: 18px; }
+.riskbox h3 { margin: 0 0 4px; font-size: 14px; color: var(--danger); }
+.riskbox p { margin: 0; font-size: 13.5px; }
+
+.spark { display: flex; align-items: flex-end; gap: 4px; height: 76px; margin-bottom: 4px; }
+.spark span { flex: 1; display: flex; align-items: flex-end; height: 100%; }
+.spark i { width: 100%; background: var(--accent); border-radius: 2px 2px 0 0; display: block; }
+.spark i.zero { background: var(--line); }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 7px; font-size: 13.5px; }
+.plain li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.detail .hint { margin: 0 0 8px; font-size: 12.5px; color: var(--muted); }
+
+.tasklist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 13.5px; }
+.tasklist li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.timeline li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; }
+.timeline time { color: var(--muted); font-size: 12.5px; padding-top: 2px; }
+.timeline p { margin: 5px 0 2px; font-size: 13.5px; }
+
+.drawer-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
+.drawer-actions .btn { text-decoration: none; }
+
+/* --------------------------------- AI bits --------------------------------- */
+.palette-ai { border-bottom: 1px solid var(--line); padding: 6px; }
+.palette-ai button {
+  display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: baseline;
+  width: 100%; text-align: left; background: var(--accent-soft); border: 0; border-radius: 6px;
+  padding: 10px 12px; cursor: pointer;
+}
+.palette-ai button:hover { filter: brightness(0.97); }
+.palette-ai .palette-empty { margin: 8px 12px; font-size: 13px; }
+
+.draft { width: min(620px, calc(100vw - 32px)); margin: 8vh auto auto; border-radius: 10px; }
+.draft .segmented { margin-bottom: 12px; }
+.draft-text {
+  width: 100%; background: var(--raised); border: 1px solid var(--line); border-radius: 6px;
+  padding: 14px; font: inherit; line-height: 1.6; resize: vertical;
+}
+.draft .hint { display: flex; gap: 8px; align-items: baseline; font-size: 12.5px; color: var(--muted); margin: 10px 0 0; }
+
+@media (max-width: 860px) {
+  .two-col { grid-template-columns: 1fr; }
+  .rfm-scores { grid-template-columns: 1fr; }
+}
+
+.palette-list li.ai-hit { background: var(--accent-soft); }
+.palette-list li.ai-hit .palette-group { color: var(--accent); font-weight: 500; }
+.palette-list li.ai-hit.active { outline: 2px solid var(--accent); outline-offset: -2px; }

@@ -173,7 +173,7 @@ describe("attention queue", () => {
   test("names follow the chosen language", () => {
     const th = attention(d, "th").find((a) => a.sample.length);
     const en = attention(d, "en").find((a) => a.sample.length);
-    expect(th?.sample[0]).toMatch(/[\u0E00-\u0E7F]/);
-    expect(en?.sample[0]).not.toMatch(/[\u0E00-\u0E7F]/);
+    expect(th?.sample[0]).toMatch(/[\u0E01-\u0E3A]/);
+    expect(en?.sample[0]).not.toMatch(/[\u0E01-\u0E3A]/);
   });
 });
