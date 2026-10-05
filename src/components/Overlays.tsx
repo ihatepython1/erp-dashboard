@@ -65,6 +65,7 @@ export function CommandPalette({ data, open, onClose }: { data: Dataset; open: b
     { id: "p-h", group: t("cmd_pages"), label: t("nav_stockHealth"), detail: "", href: "#/stock-health" },
     { id: "p-b", group: t("cmd_pages"), label: t("nav_basket"), detail: "", href: "#/basket" },
     { id: "p-a", group: t("cmd_pages"), label: t("nav_salesAnalysis"), detail: "", href: "#/sales-analysis" },
+    { id: "p-business", group: t("cmd_pages"), label: t("nav_business"), detail: "", href: "#/business" },
     { id: "p-r", group: t("cmd_pages"), label: t("nav_receivables"), detail: "", href: "#/receivables" },
     { id: "p-c", group: t("cmd_pages"), label: t("nav_customers"), detail: "", href: "#/customers" }
   ], [t]);

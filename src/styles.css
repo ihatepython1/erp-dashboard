@@ -329,12 +329,13 @@ dialog::backdrop { background: rgba(19, 23, 21, 0.45); }
   .thirds > :last-child { grid-column: 1 / -1; }
 }
 @media (max-width: 860px) {
-  .shell { grid-template-columns: 1fr; }
+  .shell { grid-template-columns: minmax(0, 1fr); }
   .side {
     position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 12px;
     padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--line);
   }
-  .side nav { flex-direction: row; overflow-x: auto; order: 3; width: 100%; }
+  .side { min-width: 0; }
+  .side nav { flex-direction: row; overflow-x: auto; order: 3; width: 100%; min-width: 0; }
   .side nav a { white-space: nowrap; }
   .side nav a[aria-current="page"] { box-shadow: inset 0 -2px 0 var(--accent); }
   .side-foot { margin: 0 0 0 auto; }
@@ -464,6 +465,30 @@ dialog::backdrop { background: rgba(19, 23, 21, 0.45); }
 }
 .kpis-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .promo-panel { margin-top: 24px; }
+.business-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.business-tabs button { padding: 12px 18px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+.business-tabs button[aria-selected="true"] { background: var(--accent); color: var(--surface); font-weight: 600; }
+.business-tabs button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.business-help { margin-bottom: 20px; }
+.business-help summary { cursor: pointer; font-weight: 600; }
+.business-help .toolbar { margin-top: 16px; }
+.business-stack { display: grid; gap: 20px; }
+.business-stack h2 { font-size: 20px; margin-bottom: 16px; }
+.business-inputs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; margin: 18px 0; }
+.business-field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.business-field .field { width: 100%; min-width: 0; }
+.business-stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 12px; margin: 18px 0; }
+.business-stat { padding: 18px; background: var(--raised); border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+.business-stat strong { font-size: 23px; overflow-wrap: anywhere; }
+.business-stat small { display: block; color: var(--muted); font-weight: normal; font-size: 12px; margin-top: 8px; }
+.offer-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(265px,1fr)); gap: 16px; }
+.offer-grid h3 { margin-bottom: 16px; }
+.offer-facts > div { display: flex; justify-content: space-between; gap: 12px; margin: 12px 0; }
+.offer-facts dd { margin: 0; font-weight: 600; white-space: nowrap; }
+.business-bridge { display: grid; grid-template-columns: 1fr auto; gap: 10px; margin: 20px 0; }
+.business-track { grid-column: 1 / -1; background: var(--raised); height: 10px; border-radius: 4px; overflow: hidden; }
+.business-track i { display: block; height: 100%; }
+@media (max-width: 640px) { .business-inputs { grid-template-columns: 1fr; } .business-tabs { display: grid; grid-template-columns: 1fr 1fr; } .business-tabs button { padding: 10px; } .offer-grid { grid-template-columns: 1fr; } }
 .sales-analysis > .panel { margin-top: 22px; }
 .analysis-dates { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
 .analysis-dates label { display: flex; flex-direction: column; gap: 6px; }
